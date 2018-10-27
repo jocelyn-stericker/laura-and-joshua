@@ -1,6 +1,8 @@
 import { css, StyleSheet } from "aphrodite";
+import ApolloClient from "apollo-boost";
 import createBrowserHistory from "history/createBrowserHistory";
 import * as React from "react";
+import { ApolloProvider } from "react-apollo";
 import * as ReactDOM from "react-dom";
 import { Route, Router } from "react-router";
 
@@ -9,6 +11,22 @@ import Header, { HEADER_HEIGHT } from "./Header";
 import Registry from "./Registry";
 import RSVP from "./RSVP";
 import { COLORS } from "./shared-styles";
+
+const graphqlClient = new ApolloClient({
+  uri: "http://localhost:5000/graphql",
+  request: operation => {
+    const auth = localStorage.getItem("auth");
+    if (auth) {
+      operation.setContext({
+        headers: {
+          Authorization: auth,
+        },
+      });
+    }
+
+    return Promise.resolve();
+  },
+});
 
 const history = createBrowserHistory();
 
@@ -30,16 +48,18 @@ const styles = StyleSheet.create({
 });
 
 ReactDOM.render(
-  <Router history={history}>
-    <div className={css(styles.page)}>
-      <Header />
-      <div className={css(styles.content)}>
-        <Route exact={true} path="/" component={Details} />
-        <Route exact={true} path="/rsvp" component={RSVP} />
-        <Route exact={true} path="/registry" component={Registry} />
+  <ApolloProvider client={graphqlClient}>
+    <Router history={history}>
+      <div className={css(styles.page)}>
+        <Header />
+        <div className={css(styles.content)}>
+          <Route exact={true} path="/" component={Details} />
+          <Route exact={true} path="/rsvp" component={RSVP} />
+          <Route exact={true} path="/registry" component={Registry} />
+        </div>
       </div>
-    </div>
-  </Router>,
+    </Router>
+  </ApolloProvider>,
 
   document.getElementById("root") as HTMLElement,
 );

@@ -2,6 +2,7 @@ import { css, StyleSheet } from "aphrodite";
 import * as React from "react";
 import { RouteComponentProps, withRouter } from "react-router";
 import { Link } from "react-router-dom";
+
 import { CANNOT_HOVER, COLORS, SMALL_SCREEN } from "./shared-styles";
 
 export const HEADER_HEIGHT = 112;
