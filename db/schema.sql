@@ -112,16 +112,18 @@ create table app_public.gift (
 );
 
 grant select, update, insert, delete on table app_public.gift to app_user;
-alter table app_public.guest enable row level security;
-create policy select_all on app_public.guest for select using (true);
-create policy update_admin on app_public.guest for update using (app_public.is_admin());
-create policy insert_admin on app_public.guest for insert with check (app_public.is_admin());
-create policy delete_admin on app_public.guest for delete using (app_public.is_admin());
+grant select on table app_public.gift to app_guest;
+alter table app_public.gift enable row level security;
+create policy select_all on app_public.gift for select using (app_public.current_family_id() is not NULL);
+create policy update_admin on app_public.gift for update using (app_public.is_admin());
+create policy insert_admin on app_public.gift for insert with check (app_public.is_admin());
+create policy delete_admin on app_public.gift for delete using (app_public.is_admin());
 
 
 -- FamilyGift
 
 create table app_public.family_gift (
+  id serial primary key,
   family_id integer,
   gift_id integer,
   foreign key (family_id) references app_public.family(id),
@@ -129,8 +131,9 @@ create table app_public.family_gift (
 );
 
 grant select, insert, delete on table app_public.family_gift to app_user;
+grant select on table app_public.family_gift to app_guest;
 alter table app_public.family_gift enable row level security;
-create policy select_all on app_public.family_gift for select using (true);
+create policy select_all on app_public.family_gift for select using (app_public.current_family_id() is not NULL);
 create policy insert_mine on app_public.family_gift for insert with check (family_id = app_public.current_family_id());
 create policy delete_mind on app_public.family_gift for delete using (family_id = app_public.current_family_id());
 

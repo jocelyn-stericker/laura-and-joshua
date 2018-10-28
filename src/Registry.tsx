@@ -3,13 +3,18 @@ import gql from "graphql-tag";
 import * as React from "react";
 import { Query } from "react-apollo";
 
+import { ApolloError } from "apollo-boost";
 import Login from "./Login";
 import Logout from "./Logout";
+import RegistryItem, { RegistryItemModel } from "./RegistryItem";
 
 interface Data {
-  currentFamily: {
+  currentFamily?: {
     id: number;
     name: string;
+  };
+  allGifts?: {
+    nodes: RegistryItemModel[];
   };
 }
 
@@ -32,6 +37,8 @@ const REGISTRY_QUERY = gql`
         category
         familyGiftsByGiftId {
           nodes {
+            id
+            familyId
             giftId
           }
         }
@@ -43,7 +50,7 @@ const REGISTRY_QUERY = gql`
 export default class Home extends React.Component {
   public render() {
     return (
-      <RegistryQuery query={REGISTRY_QUERY}>
+      <RegistryQuery query={REGISTRY_QUERY} onError={this.checkIfExpired}>
         {result => (
           <div className={css(styles.registry)}>
             {result.data &&
@@ -61,10 +68,17 @@ export default class Home extends React.Component {
             {!result.loading &&
               !result.error &&
               result.data &&
-              result.data.currentFamily && (
+              result.data.currentFamily &&
+              result.data.allGifts && (
                 <div>
                   <h1>Registry</h1>
-                  <pre>{JSON.stringify(result.data, null, 2)}</pre>
+                  {result.data.allGifts.nodes.map(node => (
+                    <RegistryItem
+                      key={node.id}
+                      item={node}
+                      familyId={result.data!.currentFamily!.id}
+                    />
+                  ))}
                 </div>
               )}
           </div>
@@ -72,6 +86,14 @@ export default class Home extends React.Component {
       </RegistryQuery>
     );
   }
+
+  private checkIfExpired = (e: ApolloError) => {
+    if (e.networkError && (e.networkError as any).statusCode === 401) {
+      delete localStorage.auth;
+      // TODO: just reload the client...
+      window.location.reload();
+    }
+  };
 }
 
 const styles = StyleSheet.create({
