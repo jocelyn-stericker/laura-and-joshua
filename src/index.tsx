@@ -13,7 +13,7 @@ import RSVP from "./RSVP";
 import { COLORS } from "./shared-styles";
 
 const graphqlClient = new ApolloClient({
-  uri: "http://localhost:5000/graphql",
+  uri: "https://api.laura-joshua.site/graphql",
   request: operation => {
     const auth = localStorage.getItem("auth");
     if (auth) {
