@@ -20,7 +20,7 @@
   },
   "scripts": {
     "start": "react-scripts-ts start",
-    "build": "react-scripts-ts build",
+    "build": "shx rm -fr docs && react-scripts-ts build && shx mv build docs",
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject"
   },
@@ -30,7 +30,8 @@
     "@types/react": "^16.4.18",
     "@types/react-dom": "^16.0.9",
     "typescript": "^3.1.3",
-    "postgraphile": "4.0.1"
+    "postgraphile": "4.0.1",
+    "shx": "0.3.2"
   },
   "prettier": {
     "trailingComma": "all"

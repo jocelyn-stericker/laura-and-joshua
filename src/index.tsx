@@ -1,6 +1,6 @@
 import { css, StyleSheet } from "aphrodite";
 import ApolloClient from "apollo-boost";
-import createBrowserHistory from "history/createBrowserHistory";
+import createHashHistory from "history/createHashHistory";
 import * as React from "react";
 import { ApolloProvider } from "react-apollo";
 import * as ReactDOM from "react-dom";
@@ -28,7 +28,7 @@ const graphqlClient = new ApolloClient({
   },
 });
 
-const history = createBrowserHistory();
+const history = createHashHistory();
 
 const styles = StyleSheet.create({
   page: {
