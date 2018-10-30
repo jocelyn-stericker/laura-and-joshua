@@ -2,7 +2,12 @@ import { css, StyleSheet } from "aphrodite";
 import gql from "graphql-tag";
 import * as React from "react";
 import { Mutation } from "react-apollo";
-import { COLORS, sharedStyles } from "./shared-styles";
+import {
+  COLORS,
+  sharedStyles,
+  SMALL_SCREEN,
+  TINY_SCREEN,
+} from "./shared-styles";
 
 export interface RegistryItemModel {
   id: number;
@@ -51,9 +56,23 @@ export default class RegistryItem extends React.Component<Props> {
           {item.name} ({formatCents(item.costCents)}){" "}
         </h2>
         <div className={css(styles.row)}>
-          <img className={css(styles.img)} src={item.image} />
+          <img className={css(styles.imgBig)} src={item.image} />
           <div>
-            <div>{item.description}</div>
+            <div className={css(styles.description)}>
+              <img className={css(styles.imgSmall)} src={item.image} />
+              <div>
+                {item.description}{" "}
+                {currentFamilyGetting.length === 0 && (
+                  <a
+                    href={item.link}
+                    target="_blank"
+                    onClick={this.confirmView}
+                  >
+                    More&hellip;
+                  </a>
+                )}
+              </div>
+            </div>
             {haveEnough &&
               item.maxCount === 1 &&
               currentFamilyGetting.length === 0 && (
@@ -69,87 +88,99 @@ export default class RegistryItem extends React.Component<Props> {
                 </div>
               )}
             {currentFamilyGetting.length > 0 && (
-              <div className={css(styles.allPurchased)}>
-                You are getting this gift. (
+              <div>
+                <div className={css(styles.allPurchased)}>
+                  You are getting this gift.
+                </div>
+                <ul>
+                  <li>
+                    <a href={item.link} target="_blank">
+                      Purchase online!
+                    </a>
+                  </li>
+                  <li>
+                    If you find the same item somewhere else, feel free to buy
+                    it there instead.
+                  </li>
+                  <li>
+                    Changed your mind?{" "}
+                    <Mutation
+                      mutation={gql`
+                        mutation undoGetGift($familyGiftId: Int!) {
+                          deleteFamilyGiftById(input: { id: $familyGiftId }) {
+                            giftByGiftId {
+                              id
+                              familyGiftsByGiftId {
+                                nodes {
+                                  familyId
+                                  giftId
+                                  id
+                                }
+                              }
+                            }
+                          }
+                        }
+                      `}
+                      variables={{
+                        familyGiftId: currentFamilyGetting[0].id,
+                      }}
+                    >
+                      {undoGetGift => (
+                        <a
+                          href="javascript:void(0)"
+                          onClick={() => undoGetGift()}
+                        >
+                          Let someone else give this.
+                        </a>
+                      )}
+                    </Mutation>
+                  </li>
+                </ul>
+              </div>
+            )}
+            {currentFamilyGetting.length === 0 && (
+              <div className={css(styles.buttonGroup)}>
                 <Mutation
+                  variables={{
+                    familyId,
+                    giftId: item.id,
+                  }}
                   mutation={gql`
-                    mutation undoGetGift($familyGiftId: Int!) {
-                      deleteFamilyGiftById(input: { id: $familyGiftId }) {
+                    mutation getAGift($familyId: Int!, $giftId: Int!) {
+                      createFamilyGift(
+                        input: {
+                          familyGift: { familyId: $familyId, giftId: $giftId }
+                        }
+                      ) {
                         giftByGiftId {
                           id
                           familyGiftsByGiftId {
                             nodes {
+                              id
                               familyId
                               giftId
-                              id
                             }
                           }
                         }
                       }
                     }
                   `}
-                  variables={{
-                    familyGiftId: currentFamilyGetting[0].id,
-                  }}
                 >
-                  {undoGetGift => (
-                    <a href="javascript:void(0)" onClick={() => undoGetGift()}>
-                      I changed my mind.
-                    </a>
+                  {buyThisGift => (
+                    <button
+                      className={css(
+                        sharedStyles.button,
+                        haveEnough && sharedStyles.buttonDisabled,
+                      )}
+                      disabled={haveEnough}
+                      onClick={() => buyThisGift()}
+                    >
+                      I will buy this gift
+                    </button>
                   )}
                 </Mutation>
-                )
               </div>
             )}
-            <div className={css(styles.buttonGroup)}>
-              <a
-                href={item.link}
-                target="_blank"
-                className={css(styles.firstButton)}
-                onClick={this.confirmView}
-              >
-                <button className={css(sharedStyles.button)}>View item</button>
-              </a>
-              <Mutation
-                variables={{
-                  familyId,
-                  giftId: item.id,
-                }}
-                mutation={gql`
-                  mutation getAGift($familyId: Int!, $giftId: Int!) {
-                    createFamilyGift(
-                      input: {
-                        familyGift: { familyId: $familyId, giftId: $giftId }
-                      }
-                    ) {
-                      giftByGiftId {
-                        id
-                        familyGiftsByGiftId {
-                          nodes {
-                            id
-                            familyId
-                            giftId
-                          }
-                        }
-                      }
-                    }
-                  }
-                `}
-              >
-                {buyThisGift => (
-                  <button
-                    className={css(
-                      sharedStyles.button,
-                      haveEnough && sharedStyles.buttonDisabled,
-                    )}
-                    disabled={haveEnough}
-                    onClick={() => buyThisGift()}
-                  >
-                    I will buy this gift
-                  </button>
-                )}
-              </Mutation>
-            </div>
           </div>
         </div>
       </div>
@@ -170,17 +201,42 @@ const styles = StyleSheet.create({
   item: {
     display: "flex",
     flexDirection: "column",
-    marginBottom: 32,
+    marginBottom: 16,
+    [SMALL_SCREEN]: {
+      marginBottom: 8,
+    },
   },
   row: {
     display: "flex",
     flexDirection: "row",
   },
-  img: {
+  imgBig: {
     maxWidth: 200,
     alignSelf: "center",
     border: `1px solid ${COLORS.plum}`,
     marginRight: 16,
+    [SMALL_SCREEN]: {
+      alignSelf: "start",
+      width: "100%",
+      maxWidth: 128,
+    },
+    [TINY_SCREEN]: {
+      display: "none",
+    },
+  },
+  description: {
+    display: "flex",
+    flexDirection: "row",
+  },
+  imgSmall: {
+    width: "100%",
+    maxWidth: 128,
+    border: `1px solid ${COLORS.plum}`,
+    display: "none",
+    [TINY_SCREEN]: {
+      display: "block",
+      marginRight: 8,
+    },
   },
   buttonGroup: {
     marginTop: 32,
