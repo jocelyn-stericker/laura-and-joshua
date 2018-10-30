@@ -231,6 +231,7 @@ const styles = StyleSheet.create({
   imgSmall: {
     width: "100%",
     maxWidth: 128,
+    alignSelf: "flex-start",
     border: `1px solid ${COLORS.plum}`,
     display: "none",
     [TINY_SCREEN]: {
