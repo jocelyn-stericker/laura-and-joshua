@@ -170,7 +170,10 @@ export default class RSVP extends React.Component {
     );
   }
   private checkIfExpired = (e: ApolloError) => {
-    if (e.networkError && (e.networkError as any).statusCode === 401) {
+    if (
+      e.networkError &&
+      [401, 403].indexOf((e.networkError as any).statusCode) > -1
+    ) {
       delete localStorage.auth;
       // TODO: just reload the client...
       window.location.reload();

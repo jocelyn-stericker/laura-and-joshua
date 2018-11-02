@@ -4,7 +4,7 @@ import createHashHistory from "history/createHashHistory";
 import * as React from "react";
 import { ApolloProvider } from "react-apollo";
 import * as ReactDOM from "react-dom";
-import { Route, Router } from "react-router";
+import { Route, Router, Switch } from "react-router";
 
 import Details from "./Details";
 import Header, { HEADER_HEIGHT } from "./Header";
@@ -13,7 +13,8 @@ import RSVP from "./RSVP";
 import { COLORS } from "./shared-styles";
 
 const graphqlClient = new ApolloClient({
-  uri: "https://api.laura-joshua.site/graphql",
+  // uri: "https://api.laura-joshua.site/graphql",
+  uri: "http://localhost:5000/graphql",
   request: operation => {
     const auth = localStorage.getItem("auth");
     if (auth) {
@@ -53,9 +54,16 @@ ReactDOM.render(
       <div className={css(styles.page)}>
         <Header />
         <div className={css(styles.content)}>
-          <Route exact={true} path="/" component={Details} />
-          <Route exact={true} path="/rsvp" component={RSVP} />
-          <Route exact={true} path="/registry" component={Registry} />
+          <Switch>
+            <Route exact={true} path="/" component={Details} />
+            <Route exact={true} path="/rsvp" component={RSVP} />
+            <Route exact={true} path="/registry" component={Registry} />
+            <Route
+              exact={true}
+              path="/registry/category/:category"
+              component={Registry}
+            />
+          </Switch>
         </div>
       </div>
     </Router>

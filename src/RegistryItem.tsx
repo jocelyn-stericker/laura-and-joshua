@@ -1,4 +1,5 @@
 import { css, StyleSheet } from "aphrodite";
+import { ApolloError } from "apollo-boost";
 import gql from "graphql-tag";
 import * as React from "react";
 import { Mutation } from "react-apollo";
@@ -165,6 +166,18 @@ export default class RegistryItem extends React.Component<Props> {
                       }
                     }
                   `}
+                  onError={(err: ApolloError) => {
+                    if (
+                      err.graphQLErrors.length === 1 &&
+                      err.graphQLErrors[0].message === "too_many_gifts"
+                    ) {
+                      alert("Someone else is already getting this gift.");
+                    } else {
+                      alert(
+                        "Something went wrong. It's not your fault. Email joshua@nettek.ca. It's probably his fault.",
+                      );
+                    }
+                  }}
                 >
                   {buyThisGift => (
                     <button

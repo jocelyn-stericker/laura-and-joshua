@@ -41,7 +41,8 @@ export class Header extends React.Component<RouteComponentProps<{}>> {
               to="/registry"
               className={css(
                 styles.section,
-                location.pathname === "/registry" && styles.currentSection,
+                location.pathname.indexOf("/registry") === 0 &&
+                  styles.currentSection,
               )}
             >
               Registry
