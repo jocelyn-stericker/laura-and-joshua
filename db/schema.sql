@@ -112,16 +112,18 @@ create table app_public.gift (
 );
 
 grant select, update, insert, delete on table app_public.gift to app_user;
-alter table app_public.guest enable row level security;
-create policy select_all on app_public.guest for select using (true);
-create policy update_admin on app_public.guest for update using (app_public.is_admin());
-create policy insert_admin on app_public.guest for insert with check (app_public.is_admin());
-create policy delete_admin on app_public.guest for delete using (app_public.is_admin());
+grant select on table app_public.gift to app_guest;
+alter table app_public.gift enable row level security;
+create policy select_all on app_public.gift for select using (app_public.current_family_id() is not NULL);
+create policy update_admin on app_public.gift for update using (app_public.is_admin());
+create policy insert_admin on app_public.gift for insert with check (app_public.is_admin());
+create policy delete_admin on app_public.gift for delete using (app_public.is_admin());
 
 
 -- FamilyGift
 
 create table app_public.family_gift (
+  id serial primary key,
   family_id integer,
   gift_id integer,
   foreign key (family_id) references app_public.family(id),
@@ -129,10 +131,39 @@ create table app_public.family_gift (
 );
 
 grant select, insert, delete on table app_public.family_gift to app_user;
+grant select on table app_public.family_gift to app_guest;
 alter table app_public.family_gift enable row level security;
-create policy select_all on app_public.family_gift for select using (true);
+create policy select_all on app_public.family_gift for select using (app_public.current_family_id() is not NULL);
 create policy insert_mine on app_public.family_gift for insert with check (family_id = app_public.current_family_id());
 create policy delete_mind on app_public.family_gift for delete using (family_id = app_public.current_family_id());
+
+
+-- Make sure we don't buy too many of a gift
+
+-- Note: this won't stop people from changing the gift id of the thing they are buying.
+create or replace function check_quantity()
+returns trigger AS $$
+declare
+  has_too_much boolean;
+begin
+  select count(1) + 1 > max_count
+    into has_too_much
+    from app_public.family_gift
+    left join app_public.gift
+      on app_public.gift.id = app_public.family_gift.gift_id
+    where app_public.gift.id = new.gift_id
+    group by max_count;
+  
+  if (has_too_much) then
+    raise exception 'too_many_gifts';
+  end if;
+
+  return new;
+end;
+$$ language plpgsql;
+
+create trigger check_quantity before insert on app_public.family_gift
+  for each row execute procedure check_quantity();
 
 -- Sequences
 

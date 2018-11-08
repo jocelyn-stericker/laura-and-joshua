@@ -1,10 +1,10 @@
 import { css, StyleSheet } from "aphrodite";
 import ApolloClient from "apollo-boost";
-import createBrowserHistory from "history/createBrowserHistory";
+import createHashHistory from "history/createHashHistory";
 import * as React from "react";
 import { ApolloProvider } from "react-apollo";
 import * as ReactDOM from "react-dom";
-import { Route, Router } from "react-router";
+import { Route, Router, Switch } from "react-router";
 
 import Details from "./Details";
 import Header, { HEADER_HEIGHT } from "./Header";
@@ -13,7 +13,7 @@ import RSVP from "./RSVP";
 import { COLORS } from "./shared-styles";
 
 const graphqlClient = new ApolloClient({
-  uri: "http://localhost:5000/graphql",
+  uri: "https://api.laura-joshua.site/graphql",
   request: operation => {
     const auth = localStorage.getItem("auth");
     if (auth) {
@@ -28,7 +28,7 @@ const graphqlClient = new ApolloClient({
   },
 });
 
-const history = createBrowserHistory();
+const history = createHashHistory();
 
 const styles = StyleSheet.create({
   page: {
@@ -53,9 +53,16 @@ ReactDOM.render(
       <div className={css(styles.page)}>
         <Header />
         <div className={css(styles.content)}>
-          <Route exact={true} path="/" component={Details} />
-          <Route exact={true} path="/rsvp" component={RSVP} />
-          <Route exact={true} path="/registry" component={Registry} />
+          <Switch>
+            <Route exact={true} path="/" component={Details} />
+            <Route exact={true} path="/rsvp" component={RSVP} />
+            <Route exact={true} path="/registry" component={Registry} />
+            <Route
+              exact={true}
+              path="/registry/category/:category"
+              component={Registry}
+            />
+          </Switch>
         </div>
       </div>
     </Router>

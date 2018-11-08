@@ -3,6 +3,7 @@ import gql from "graphql-tag";
 import * as React from "react";
 import { Mutation, Query } from "react-apollo";
 
+import { ApolloError } from "apollo-boost";
 import Login from "./Login";
 import Logout from "./Logout";
 import RSVPGuest, { Guest } from "./RSVPGuest";
@@ -41,7 +42,7 @@ const RSVP_QUERY = gql`
 export default class RSVP extends React.Component {
   public render() {
     return (
-      <RSVPQuery query={RSVP_QUERY}>
+      <RSVPQuery query={RSVP_QUERY} onError={this.checkIfExpired}>
         {result => (
           <div className={css(styles.rsvp)}>
             {result.data &&
@@ -161,7 +162,6 @@ export default class RSVP extends React.Component {
                       </button>
                     )}
                   </Mutation>
-                  <button className={css(sharedStyles.button)}>Done</button>
                 </div>
               )}
           </div>
@@ -169,6 +169,16 @@ export default class RSVP extends React.Component {
       </RSVPQuery>
     );
   }
+  private checkIfExpired = (e: ApolloError) => {
+    if (
+      e.networkError &&
+      [401, 403].indexOf((e.networkError as any).statusCode) > -1
+    ) {
+      delete localStorage.auth;
+      // TODO: just reload the client...
+      window.location.reload();
+    }
+  };
 }
 
 const styles = StyleSheet.create({

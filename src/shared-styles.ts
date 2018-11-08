@@ -10,6 +10,7 @@ export const COLORS = {
 };
 
 export const SMALL_SCREEN = "@media (max-width: 768px)";
+export const TINY_SCREEN = "@media (max-width: 540px)";
 export const CANNOT_HOVER = "@media (hover: none)";
 
 const buttonStyle: StyleDeclaration = {
