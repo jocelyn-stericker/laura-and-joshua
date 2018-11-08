@@ -44,6 +44,7 @@ const styles = StyleSheet.create({
     background: COLORS.white,
     minHeight: `calc(100vh - ${HEADER_HEIGHT}px - 16px * 4)`,
     marginBottom: 32,
+    display: "flex",
   },
 });
 
