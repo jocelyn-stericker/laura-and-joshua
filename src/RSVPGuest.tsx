@@ -8,6 +8,7 @@ import { COLORS, sharedStyles } from "./shared-styles";
 export interface Guest {
   id: number;
   name: string | null;
+  email: string | null;
   comment: string | null;
   dietaryRestrictions: string | null;
   acceptedCeremony: boolean | null;
@@ -20,6 +21,7 @@ interface Props {
 
 interface State {
   name: string | null;
+  email: string | null;
   comment: string | null;
   dietaryRestrictions: string | null;
   acceptedCeremony: boolean | null;
@@ -37,6 +39,7 @@ export default class RSVPGuest extends React.Component<Props, State> {
 
     const canUpdate =
       this.state.name !== this.props.guest.name ||
+      this.state.email !== this.props.guest.email ||
       this.state.comment !== this.props.guest.comment ||
       this.state.dietaryRestrictions !== this.props.guest.dietaryRestrictions ||
       this.state.acceptedCeremony !== this.props.guest.acceptedCeremony ||
@@ -46,12 +49,15 @@ export default class RSVPGuest extends React.Component<Props, State> {
       this.state.acceptedCeremony != null &&
       this.state.acceptedReception != null;
 
+    const hasName = (this.state.name || "").length > 0;
+
     return (
       <Mutation
         mutation={gql`
           mutation updateGuest(
             $id: Int!
             $name: String
+            $email: String
             $comment: String
             $dietaryRestrictions: String
             $acceptedCeremony: Boolean!
@@ -62,6 +68,7 @@ export default class RSVPGuest extends React.Component<Props, State> {
                 id: $id
                 guestPatch: {
                   name: $name
+                  email: $email
                   comment: $comment
                   dietaryRestrictions: $dietaryRestrictions
                   acceptedCeremony: $acceptedCeremony
@@ -72,6 +79,7 @@ export default class RSVPGuest extends React.Component<Props, State> {
               guest {
                 id
                 name
+                email
                 comment
                 dietaryRestrictions
                 acceptedCeremony
@@ -83,6 +91,7 @@ export default class RSVPGuest extends React.Component<Props, State> {
         variables={{
           id,
           name: this.state.name,
+          email: this.state.email,
           comment: this.state.comment,
           dietaryRestrictions: this.state.dietaryRestrictions,
           acceptedCeremony: this.state.acceptedCeremony,
@@ -99,6 +108,22 @@ export default class RSVPGuest extends React.Component<Props, State> {
                 id={`${keyPrefix}_name`}
                 value={this.state.name || ""}
                 onChange={ev => this.setState({ name: ev.target.value })}
+                className={css(styles.textInput, styles.nameInput)}
+              />
+            </div>
+
+            <label className={css(styles.label)} htmlFor={`${keyPrefix}_email`}>
+              Email &mdash; Recommended
+            </label>
+            <div>
+              We will use your email for running the wedding and sending you
+              wedding updates, including pictures.
+            </div>
+            <div className={css(styles.formRow)}>
+              <input
+                id={`${keyPrefix}_email`}
+                value={this.state.email || ""}
+                onChange={ev => this.setState({ email: ev.target.value })}
                 className={css(styles.textInput, styles.nameInput)}
               />
             </div>
@@ -207,16 +232,23 @@ export default class RSVPGuest extends React.Component<Props, State> {
 
             <div>
               {didRespond &&
+                hasName &&
                 canUpdate && (
-                  <button
-                    onClick={ev => {
-                      ev.preventDefault();
-                      save();
-                    }}
-                    className={css(sharedStyles.button)}
-                  >
-                    RSVP
-                  </button>
+                  <div>
+                    <button
+                      onClick={ev => {
+                        ev.preventDefault();
+                        save();
+                      }}
+                      className={css(sharedStyles.button)}
+                    >
+                      RSVP
+                    </button>
+                    <div>
+                      Your changes for this guest aren't saved until you click
+                      RSVP.
+                    </div>
+                  </div>
                 )}
               {!didRespond && (
                 <div>
@@ -232,6 +264,19 @@ export default class RSVPGuest extends React.Component<Props, State> {
                 </div>
               )}
               {didRespond &&
+                !hasName && (
+                  <div>
+                    <button
+                      disabled={true}
+                      className={css(sharedStyles.buttonDisabled)}
+                    >
+                      RSVP
+                    </button>
+                    <div>To RSVP, first enter a name.</div>
+                  </div>
+                )}
+              {didRespond &&
+                hasName &&
                 !canUpdate && (
                   <div>
                     <button

@@ -29,6 +29,7 @@ const RSVP_QUERY = gql`
         nodes {
           id
           name
+          email
           comment
           dietaryRestrictions
           acceptedCeremony
@@ -170,10 +171,8 @@ export default class RSVP extends React.Component {
     );
   }
   private checkIfExpired = (e: ApolloError) => {
-    if (
-      e.networkError &&
-      [401, 403].indexOf((e.networkError as any).statusCode) > -1
-    ) {
+    // TODO: check error for 403
+    if (localStorage.auth) {
       delete localStorage.auth;
       // TODO: just reload the client...
       window.location.reload();
@@ -184,6 +183,7 @@ export default class RSVP extends React.Component {
 const styles = StyleSheet.create({
   rsvp: {
     fontFamily: "Cormorant",
+    width: "100%",
   },
   plusOne: {
     marginTop: 24,

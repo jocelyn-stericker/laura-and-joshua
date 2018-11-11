@@ -148,10 +148,8 @@ export default class Registry extends React.Component<Props> {
   }
 
   private checkIfExpired = (e: ApolloError) => {
-    if (
-      e.networkError &&
-      [401, 403].indexOf((e.networkError as any).statusCode) > -1
-    ) {
+    // TODO: check error for 403
+    if (localStorage.auth) {
       delete localStorage.auth;
       // TODO: just reload the client...
       window.location.reload();

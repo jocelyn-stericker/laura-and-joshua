@@ -82,6 +82,7 @@ create table app_public.guest (
   id serial primary key,
   family_id integer,
   name text,
+  email text,
   comment text,
   dietary_restrictions text,
   accepted_ceremony boolean,

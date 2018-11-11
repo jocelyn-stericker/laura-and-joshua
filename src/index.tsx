@@ -14,6 +14,7 @@ import { COLORS } from "./shared-styles";
 
 const graphqlClient = new ApolloClient({
   uri: "https://api.laura-joshua.site/graphql",
+  // uri: "http://localhost:5000/graphql",
   request: operation => {
     const auth = localStorage.getItem("auth");
     if (auth) {

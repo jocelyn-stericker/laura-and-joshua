@@ -63,14 +63,21 @@ export default class RegistryItem extends React.Component<Props> {
               <img className={css(styles.imgSmall)} src={item.image} />
               <div>
                 {item.description}{" "}
-                {currentFamilyGetting.length === 0 && (
-                  <a
-                    href={item.link}
-                    target="_blank"
-                    onClick={this.confirmView}
-                  >
-                    More&hellip;
-                  </a>
+                {currentFamilyGetting.length === 0 &&
+                  item.link && (
+                    <a
+                      href={item.link}
+                      target="_blank"
+                      onClick={this.confirmView}
+                    >
+                      More&hellip;
+                    </a>
+                  )}
+                {item.maxCount > 1 && (
+                  <div>
+                    <br />
+                    Claimed: {count}/{item.maxCount}
+                  </div>
                 )}
               </div>
             </div>
@@ -94,15 +101,80 @@ export default class RegistryItem extends React.Component<Props> {
                   You are getting this gift.
                 </div>
                 <ul>
-                  <li>
-                    <a href={item.link} target="_blank">
-                      Purchase online!
-                    </a>
-                  </li>
-                  <li>
-                    If you find the same item somewhere else, feel free to buy
-                    it there instead.
-                  </li>
+                  {item.link && (
+                    <li>
+                      <a href={item.link} target="_blank">
+                        Purchase online!
+                      </a>
+                    </li>
+                  )}
+                  {item.link && (
+                    <li>
+                      If you find the same item somewhere else, feel free to buy
+                      it there instead.
+                    </li>
+                  )}
+                  {item.maxCount > 1 && (
+                    <li>
+                      You are getting {currentFamilyGetting.length} of these.{" "}
+                      {count >= item.maxCount ? (
+                        <strong>Awesome, that's all we need.</strong>
+                      ) : (
+                        <Mutation
+                          variables={{
+                            familyId,
+                            giftId: item.id,
+                          }}
+                          mutation={gql`
+                            mutation getAGift($familyId: Int!, $giftId: Int!) {
+                              createFamilyGift(
+                                input: {
+                                  familyGift: {
+                                    familyId: $familyId
+                                    giftId: $giftId
+                                  }
+                                }
+                              ) {
+                                giftByGiftId {
+                                  id
+                                  familyGiftsByGiftId {
+                                    nodes {
+                                      id
+                                      familyId
+                                      giftId
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          `}
+                          onError={(err: ApolloError) => {
+                            if (
+                              err.graphQLErrors.length === 1 &&
+                              err.graphQLErrors[0].message === "too_many_gifts"
+                            ) {
+                              alert(
+                                "Sorry, it appears that we already have enough of these.",
+                              );
+                            } else {
+                              alert(
+                                "Something went wrong. It's not your fault. Email joshua@nettek.ca. It's probably his fault.",
+                              );
+                            }
+                          }}
+                        >
+                          {buyThisGift => (
+                            <a
+                              href="javascript:void(0)"
+                              onClick={() => buyThisGift()}
+                            >
+                              Get another!
+                            </a>
+                          )}
+                        </Mutation>
+                      )}
+                    </li>
+                  )}
                   <li>
                     Changed your mind?{" "}
                     <Mutation
