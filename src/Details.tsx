@@ -119,6 +119,10 @@ const styles = StyleSheet.create({
     backgroundSize: "contain",
     margin: 10,
     marginLeft: -20,
+    [SMALL_SCREEN]: {
+      width: "100%",
+      marginLeft: 0,
+    },
   },
   schedule: {
     marginTop: 16,

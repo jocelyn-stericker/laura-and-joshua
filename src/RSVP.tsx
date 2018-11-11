@@ -135,6 +135,7 @@ export default class RSVP extends React.Component {
                                 nodes {
                                   id
                                   name
+                                  email
                                   comment
                                   dietaryRestrictions
                                   acceptedCeremony

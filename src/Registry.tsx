@@ -114,7 +114,7 @@ export default class Registry extends React.Component<Props> {
                         Filter by category:{" "}
                         <span className={css(styles.categoryGroup)}>
                           {categories.map(category => (
-                            <span>
+                            <span key={category}>
                               <Link
                                 className={css(styles.category)}
                                 to={`/registry/category/${category}`}
