@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 import Login from "./Login";
 import Logout from "./Logout";
 import RegistryItem, { RegistryItemModel } from "./RegistryItem";
-import { COLORS } from "./shared-styles";
+import { COLORS, SMALL_SCREEN } from "./shared-styles";
 
 interface Data {
   currentFamily?: {
@@ -105,23 +105,25 @@ export default class Registry extends React.Component<Props> {
                       <div>
                         Only showing items in category{" "}
                         <strong>{selectedCategory}</strong>.{" "}
-                        <Link className={css(styles.category)} to="/registry">
+                        <Link className={css(styles.showAll)} to="/registry">
                           Show all items
                         </Link>
                       </div>
                     ) : (
                       <div>
                         Filter by category:{" "}
-                        {categories.map(category => (
-                          <span>
-                            <Link
-                              className={css(styles.category)}
-                              to={`/registry/category/${category}`}
-                            >
-                              {category[0].toUpperCase() + category.slice(1)}
-                            </Link>{" "}
-                          </span>
-                        ))}
+                        <span className={css(styles.categoryGroup)}>
+                          {categories.map(category => (
+                            <span>
+                              <Link
+                                className={css(styles.category)}
+                                to={`/registry/category/${category}`}
+                              >
+                                {category[0].toUpperCase() + category.slice(1)}
+                              </Link>{" "}
+                            </span>
+                          ))}
+                        </span>
                       </div>
                     )}
 
@@ -169,6 +171,30 @@ const styles = StyleSheet.create({
     textDecoration: "none",
     [":hover"]: {
       background: COLORS.plum,
+    },
+    [SMALL_SCREEN]: {
+      display: "block",
+      marginBottom: "10px",
+    },
+  },
+  showAll: {
+    border: `1px solid ${COLORS.darkTeal}`,
+    borderRadius: 4,
+    background: COLORS.lightTeal,
+    color: COLORS.white,
+    padding: "4px 16px",
+    fontWeight: "bold",
+    marginLeft: 8,
+    textDecoration: "none",
+    [":hover"]: {
+      background: COLORS.plum,
+    },
+  },
+  categoryGroup: {
+    [SMALL_SCREEN]: {
+      display: "flex",
+      flexWrap: "wrap",
+      marginTop: 10,
     },
   },
   registry: {
