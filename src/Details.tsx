@@ -12,7 +12,7 @@ export default class Home extends React.Component {
             <h1 className={css(styles.heading)}>When</h1>
             We look forward to celebrating with you on{" "}
             <strong>January 26th, 2019</strong>.
-            <h1 className={css(styles.heading)}>Schedule</h1>
+            <h2 className={css(styles.heading)}>Schedule</h2>
             The schedule will be as follows:
             <div className={css(styles.schedule)}>
               <div>
