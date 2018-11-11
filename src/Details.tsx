@@ -113,12 +113,12 @@ const styles = StyleSheet.create({
     },
   },
   washiHorizontal: {
-    width: "100%",
+    width: "calc(100% + 20px)",
     height: 50,
     background: "url(washi_2.svg)",
     backgroundSize: "contain",
     margin: 10,
-    marginLeft: -5,
+    marginLeft: -20,
   },
   schedule: {
     marginTop: 16,

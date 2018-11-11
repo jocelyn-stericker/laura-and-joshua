@@ -203,7 +203,9 @@ export default class RegistryItem extends React.Component<Props> {
                           href="javascript:void(0)"
                           onClick={() => undoGetGift()}
                         >
-                          Let someone else give this.
+                          {currentFamilyGetting.length > 1
+                            ? "Get one less."
+                            : "Let someone else give this."}
                         </a>
                       )}
                     </Mutation>
