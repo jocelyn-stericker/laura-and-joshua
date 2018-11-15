@@ -43,7 +43,7 @@ export default class Home extends React.Component {
             <h2 className={css(styles.heading)}>Hotel</h2>
             We do not have a block booking for a hotel, however, there are many
             hotels near the airport to choose from. We recommend{" "}
-            <a href="https:/www.ihg.com/holidayinn/hotels/us/en/toronto/yyzae/hoteldetail">
+            <a href="https://www.ihg.com/holidayinn/hotels/us/en/toronto/yyzae/hoteldetail">
               Holiday Inn Toronto-Airport East
             </a>
             .
