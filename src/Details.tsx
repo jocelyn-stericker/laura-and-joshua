@@ -34,7 +34,7 @@ export default class Home extends React.Component {
             Both the ceremony and reception will be held at:
             <div className={css(styles.address)}>
               Richview Baptist Church <br />
-              15484 Kipling Ave. <br />
+              1548 Kipling Ave. <br />
               Etobicoke, ON Canada <br />
             </div>
             <h2 className={css(styles.heading)}>Airport</h2>
