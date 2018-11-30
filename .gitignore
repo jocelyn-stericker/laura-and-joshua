@@ -21,4 +21,4 @@ yarn-debug.log*
 yarn-error.log*
 
 # Secret user data
-db/user_data.sql
+db/*user_data*.sql

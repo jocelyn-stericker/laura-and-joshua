@@ -13,6 +13,7 @@ interface Data {
   currentFamily: {
     id: number;
     name: string;
+    invitedToReception: boolean;
     guestsByFamilyId: {
       nodes: Guest[];
     };
@@ -25,6 +26,7 @@ const RSVP_QUERY = gql`
     currentFamily {
       id
       name
+      invitedToReception
       guestsByFamilyId {
         nodes {
           id
@@ -46,13 +48,12 @@ export default class RSVP extends React.Component {
       <RSVPQuery query={RSVP_QUERY} onError={this.checkIfExpired}>
         {result => (
           <div className={css(styles.rsvp)}>
-            {result.data &&
-              result.data.currentFamily && (
-                <Logout
-                  name={result.data.currentFamily.name}
-                  client={result.client}
-                />
-              )}
+            {result.data && result.data.currentFamily && (
+              <Logout
+                name={result.data.currentFamily.name}
+                client={result.client}
+              />
+            )}
             {result.loading && <span>Loading&hellip;</span>}
             {result.error && <span>Could not load this page.</span>}
             {!result.loading &&
@@ -109,7 +110,14 @@ export default class RSVP extends React.Component {
                           </Mutation>
                           )
                         </h2>
-                        <RSVPGuest key={guest.id} guest={guest} />
+                        <RSVPGuest
+                          key={guest.id}
+                          guest={guest}
+                          invitedToReception={Boolean(
+                            result.data &&
+                              result.data.currentFamily.invitedToReception,
+                          )}
+                        />
                       </div>
                     ),
                   )}

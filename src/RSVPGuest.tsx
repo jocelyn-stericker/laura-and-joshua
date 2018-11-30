@@ -17,6 +17,7 @@ export interface Guest {
 
 interface Props {
   guest: Guest;
+  invitedToReception: boolean;
 }
 
 interface State {
@@ -34,6 +35,7 @@ export default class RSVPGuest extends React.Component<Props, State> {
   };
 
   public render() {
+    const { invitedToReception } = this.props;
     const { id } = this.props.guest;
     const keyPrefix = `RSVPGuest_${id}`;
 
@@ -165,55 +167,65 @@ export default class RSVPGuest extends React.Component<Props, State> {
                   }
                 />
                 <label htmlFor={`${keyPrefix}_onlyCeremony`}>
-                  Yes, just the ceremony.
+                  {invitedToReception
+                    ? "Yes, just the ceremony."
+                    : "Yes, I will attend the ceremony."}
                 </label>
               </div>
-              <div className={css(styles.reception)}>
-                <input
-                  id={`${keyPrefix}_attending`}
-                  className={css(styles.checkbox)}
-                  type="radio"
-                  checked={
-                    this.state.acceptedCeremony === true &&
-                    this.state.acceptedReception === true
-                  }
-                  onChange={ev =>
-                    this.setState({
-                      acceptedReception: true,
-                      acceptedCeremony: true,
-                    })
-                  }
-                />
-                <label htmlFor={`${keyPrefix}_attending`}>
-                  Yes, both the ceremony and reception!
-                </label>
-              </div>
+              {invitedToReception && (
+                <div className={css(styles.reception)}>
+                  <input
+                    id={`${keyPrefix}_attending`}
+                    className={css(styles.checkbox)}
+                    type="radio"
+                    checked={
+                      this.state.acceptedCeremony === true &&
+                      this.state.acceptedReception === true
+                    }
+                    onChange={ev =>
+                      this.setState({
+                        acceptedReception: true,
+                        acceptedCeremony: true,
+                      })
+                    }
+                  />
+                  <label htmlFor={`${keyPrefix}_attending`}>
+                    Yes, both the ceremony and reception!
+                  </label>
+                </div>
+              )}
             </fieldset>
 
-            <div>
-              <label
-                className={css(styles.label)}
-                htmlFor={`${keyPrefix}_diet`}
-              >
-                Do you have any dietary restrictions?
-              </label>
-            </div>
-            <textarea
-              className={css(styles.textInput)}
-              id={`${keyPrefix}_diet`}
-              value={this.state.dietaryRestrictions || ""}
-              placeholder="All food will be vegetarian. Please let us know about any other dietary restrictions."
-              disabled={!this.state.acceptedReception}
-              onChange={ev =>
-                this.setState({ dietaryRestrictions: ev.target.value })
-              }
-            />
+            {invitedToReception && (
+              <div>
+                <label
+                  className={css(styles.label)}
+                  htmlFor={`${keyPrefix}_diet`}
+                >
+                  Do you have any dietary restrictions?
+                </label>
+              </div>
+            )}
+            {invitedToReception && (
+              <textarea
+                className={css(styles.textInput)}
+                id={`${keyPrefix}_diet`}
+                value={this.state.dietaryRestrictions || ""}
+                placeholder="All food will be vegetarian. Please let us know about any other dietary restrictions."
+                disabled={!this.state.acceptedReception}
+                onChange={ev =>
+                  this.setState({ dietaryRestrictions: ev.target.value })
+                }
+              />
+            )}
             {(this.state.dietaryRestrictions || "").indexOf("meat") > -1 && (
               <div className={css(styles.meatTroll)}>
                 You will have time to find meat between the ceremony and the
                 reception.
               </div>
             )}
+
+            {!invitedToReception && <div style={{ height: 16 }} />}
 
             <div>
               <label
@@ -231,25 +243,23 @@ export default class RSVPGuest extends React.Component<Props, State> {
             />
 
             <div>
-              {didRespond &&
-                hasName &&
-                canUpdate && (
+              {didRespond && hasName && canUpdate && (
+                <div>
+                  <button
+                    onClick={ev => {
+                      ev.preventDefault();
+                      save();
+                    }}
+                    className={css(sharedStyles.button)}
+                  >
+                    RSVP
+                  </button>
                   <div>
-                    <button
-                      onClick={ev => {
-                        ev.preventDefault();
-                        save();
-                      }}
-                      className={css(sharedStyles.button)}
-                    >
-                      RSVP
-                    </button>
-                    <div>
-                      Your changes for this guest aren't saved until you click
-                      RSVP.
-                    </div>
+                    Your changes for this guest aren't saved until you click
+                    RSVP.
                   </div>
-                )}
+                </div>
+              )}
               {!didRespond && (
                 <div>
                   <button
@@ -263,31 +273,28 @@ export default class RSVPGuest extends React.Component<Props, State> {
                   </div>
                 </div>
               )}
-              {didRespond &&
-                !hasName && (
-                  <div>
-                    <button
-                      disabled={true}
-                      className={css(sharedStyles.buttonDisabled)}
-                    >
-                      RSVP
-                    </button>
-                    <div>To RSVP, first enter a name.</div>
-                  </div>
-                )}
-              {didRespond &&
-                hasName &&
-                !canUpdate && (
-                  <div>
-                    <button
-                      disabled={true}
-                      className={css(sharedStyles.buttonDisabled)}
-                    >
-                      RSVP
-                    </button>
-                    <div>All changes saved!</div>
-                  </div>
-                )}
+              {didRespond && !hasName && (
+                <div>
+                  <button
+                    disabled={true}
+                    className={css(sharedStyles.buttonDisabled)}
+                  >
+                    RSVP
+                  </button>
+                  <div>To RSVP, first enter a name.</div>
+                </div>
+              )}
+              {didRespond && hasName && !canUpdate && (
+                <div>
+                  <button
+                    disabled={true}
+                    className={css(sharedStyles.buttonDisabled)}
+                  >
+                    RSVP
+                  </button>
+                  <div>All changes saved!</div>
+                </div>
+              )}
             </div>
           </form>
         )}

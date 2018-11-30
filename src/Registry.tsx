@@ -22,7 +22,7 @@ interface Data {
 
 class RegistryQuery extends Query<Data, {}> {}
 const REGISTRY_QUERY = gql`
-  query rsvpPage {
+  query registryPage {
     currentFamily {
       id
       name
@@ -82,13 +82,12 @@ export default class Registry extends React.Component<Props> {
 
           return (
             <div className={css(styles.registry)}>
-              {result.data &&
-                result.data.currentFamily && (
-                  <Logout
-                    name={result.data.currentFamily.name}
-                    client={result.client}
-                  />
-                )}
+              {result.data && result.data.currentFamily && (
+                <Logout
+                  name={result.data.currentFamily.name}
+                  client={result.client}
+                />
+              )}
               {result.loading && <span>Loading&hellip;</span>}
               {result.error && <span>Could not load this page.</span>}
               {!result.loading &&
