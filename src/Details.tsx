@@ -59,11 +59,11 @@ export default class Home extends React.Component {
           <div className={css(styles.name)}>Darlene Stericker</div>
           <div className={css(styles.email)}>darlenestericker@gmail.com</div>
           <h2 className={css(styles.heading)}>Address</h2>
-          After December 28th 2018, our address will be: <br />
+          Our address is: <br />
           <div className={css(styles.address)}>
             1207-4 Willow Street <br />
             Waterloo, Ontario <br />
-            N2J 4S3
+            N2J 4S2
           </div>
         </div>
       </div>
